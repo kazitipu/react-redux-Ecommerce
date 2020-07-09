@@ -46,11 +46,13 @@ class SignIn extends React.Component {
   onGoogleSignIn = async () => {
     await auth.signInWithPopup(provider);
     auth.onAuthStateChanged((user) => {
-      firestore.doc(`users/${user.uid}`).set({
-        displayName: user.displayName,
-        email: user.email,
-        password: "",
-      });
+      if (user) {
+        firestore.doc(`users/${user.uid}`).set({
+          displayName: user.displayName,
+          email: user.email,
+          password: "",
+        });
+      }
     });
   };
 
@@ -77,7 +79,7 @@ class SignIn extends React.Component {
           />
           <div className="buttons">
             <CustomButton type="submit"> SIGN IN </CustomButton>
-            <CustomButton onClick={this.onGoogleSignIn}>
+            <CustomButton onClick={this.onGoogleSignIn} isGoogleSignIn>
               SIGN IN WITH GOOGLE
             </CustomButton>
           </div>

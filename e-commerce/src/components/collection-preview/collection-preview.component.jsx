@@ -18,13 +18,8 @@ class CollectionPreview extends React.Component {
             <div className="preview">
               {section.items
                 .filter((item, idx) => idx < 4)
-                .map(({ id, imageUrl, name, price }) => (
-                  <CollectionItem
-                    key={id}
-                    imageUrl={imageUrl}
-                    name={name}
-                    price={price}
-                  />
+                .map((item) => (
+                  <CollectionItem key={item.id} item={item} />
                 ))}
             </div>
           </div>

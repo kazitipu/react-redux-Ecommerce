@@ -1,24 +1,16 @@
 import React from "react";
 import "./App.css";
-import { BrowserRouter, Route } from "react-router-dom";
+import { Route } from "react-router-dom";
 import HomePage from "./pages/homepage/homepage.component";
 import ShopPage from "./pages/shop-page/shop-page.component";
 import Header from "./components/header/header.component";
 import SignInAndSignUpPage from "./pages/signIn-and-signUp-page/signIn-and-signUp-page.component";
 import { auth, firestore } from "./firebase/firebase.utils";
-class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.subcription = null;
+import { connect } from "react-redux";
+import { setCurrentUser } from "./redux/users/users.action";
+import CheckoutPage from "./pages/chekcout/checkout.component";
 
-    this.state = {
-      currentUser: {
-        displayName: "",
-        email: "",
-        password: "",
-      },
-    };
-  }
+class App extends React.Component {
   unsuscribeFromAuth = null;
   componentDidMount() {
     this.unsuscribeFromAuth = auth.onAuthStateChanged(async (user) => {
@@ -29,24 +21,19 @@ class App extends React.Component {
           .get()
           .then((doc) => {
             console.log(doc.data());
-            this.setState({
-              currentUser: {
-                displayName: doc.data().displayName,
-                email: doc.data().email,
-                password: doc.data().password,
-              },
+            this.props.setCurrentUser({
+              displayName: doc.data().displayName,
+              email: doc.data().email,
+              password: doc.data().password,
             });
           });
       } else {
-        this.setState({
-          currentUser: {
-            displayName: "",
-            email: "",
-            password: "",
-          },
+        this.props.setCurrentUser({
+          displayName: "",
+          email: "",
+          password: "",
         });
       }
-      console.log(this.state.currentUser);
     });
   }
 
@@ -55,14 +42,15 @@ class App extends React.Component {
   }
 
   setCurrentUser = (user) => {
-    this.setState({ currentUser: user });
+    this.props.setCurrentUser({ currentUser: user });
   };
   render() {
     return (
-      <BrowserRouter>
-        <Header currentUser={this.state.currentUser} />
+      <div>
+        <Header />
         <Route exact path="/" component={HomePage} />
         <Route exact path="/shop" component={ShopPage} />
+        <Route exact path="/checkout" component={CheckoutPage} />
         <Route
           exact
           path="/signin"
@@ -70,8 +58,9 @@ class App extends React.Component {
             <SignInAndSignUpPage setCurrentUser={this.setCurrentUser} />
           )}
         />
-      </BrowserRouter>
+      </div>
     );
   }
 }
-export default App;
+
+export default connect(null, { setCurrentUser })(App);

@@ -3,25 +3,43 @@ import "./header.styles.scss";
 import { Link } from "react-router-dom";
 import { ReactComponent as Logo } from "../../assets/crown.svg";
 import { auth } from "../../firebase/firebase.utils";
+import { connect } from "react-redux";
+import CartIcon from "../cart-icon/cart-icon.component";
+import CartDropDown from "../cart-dropdown/cart-dropdown.component";
+import { selectCurrentUser } from "../../redux/users/users.selector";
+import { createStructuredSelector } from "reselect";
+import { selectCartHidden } from "../../redux/cart/cart.selectors";
 
 class Header extends React.Component {
   renderButton = () => {
     const { currentUser } = this.props;
-    if (!currentUser.email) {
+    console.log(currentUser);
+
+    if (!currentUser) {
       return (
         <Link to="/signin" className="option">
           SIGN IN
         </Link>
       );
     } else {
-      return (
-        <>
-          <div className="option">{currentUser.displayName.toUpperCase()}</div>
-          <div onClick={() => auth.signOut()} className="option">
-            SIGN OUT
-          </div>
-        </>
-      );
+      if (!currentUser.displayName) {
+        return (
+          <Link to="/signin" className="option">
+            SIGN IN
+          </Link>
+        );
+      } else {
+        return (
+          <>
+            <div className="option">
+              {currentUser.displayName.toUpperCase()}
+            </div>
+            <div onClick={() => auth.signOut()} className="option">
+              SIGN OUT
+            </div>
+          </>
+        );
+      }
     }
   };
 
@@ -39,9 +57,15 @@ class Header extends React.Component {
             CONTACT
           </Link>
           {this.renderButton()}
+          <CartIcon className="option" />
         </div>
+        {this.props.hidden ? null : <CartDropDown />}
       </div>
     );
   }
 }
-export default Header;
+const mapStateToProps = createStructuredSelector({
+  currentUser: selectCurrentUser,
+  hidden: selectCartHidden,
+});
+export default connect(mapStateToProps)(Header);
