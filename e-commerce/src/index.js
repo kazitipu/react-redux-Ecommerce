@@ -9,14 +9,19 @@ import { applyMiddleware } from "redux";
 import { logger } from "redux-logger";
 import reducer from "./redux/rootReducer";
 import { createStore } from "redux";
+import { persistStore } from "redux-persist";
+import { PersistGate } from "redux-persist/integration/react";
 
 const store = createStore(reducer, applyMiddleware(logger));
+const persistor = persistStore(store);
 
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
       <BrowserRouter>
-        <App />
+        <PersistGate persistor={persistor}>
+          <App />
+        </PersistGate>
       </BrowserRouter>
     </Provider>
   </React.StrictMode>,

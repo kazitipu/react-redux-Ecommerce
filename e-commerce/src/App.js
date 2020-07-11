@@ -9,6 +9,7 @@ import { auth, firestore } from "./firebase/firebase.utils";
 import { connect } from "react-redux";
 import { setCurrentUser } from "./redux/users/users.action";
 import CheckoutPage from "./pages/chekcout/checkout.component";
+import CollectionPage from "./pages/collection/collection.component";
 
 class App extends React.Component {
   unsuscribeFromAuth = null;
@@ -48,6 +49,7 @@ class App extends React.Component {
     return (
       <div>
         <Header />
+        <Route exact path="/shop/:collectionId" component={CollectionPage} />
         <Route exact path="/" component={HomePage} />
         <Route exact path="/shop" component={ShopPage} />
         <Route exact path="/checkout" component={CheckoutPage} />
