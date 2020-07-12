@@ -9,6 +9,7 @@ import CartDropDown from "../cart-dropdown/cart-dropdown.component";
 import { selectCurrentUser } from "../../redux/users/users.selector";
 import { createStructuredSelector } from "reselect";
 import { selectCartHidden } from "../../redux/cart/cart.selectors";
+import { setCurrentUser } from "../../redux/users/users.action";
 
 class Header extends React.Component {
   renderButton = () => {
@@ -34,7 +35,12 @@ class Header extends React.Component {
             <div className="option">
               {currentUser.displayName.toUpperCase()}
             </div>
-            <div onClick={() => auth.signOut()} className="option">
+            <div
+              onClick={() => {
+                auth.signOut();
+              }}
+              className="option"
+            >
               SIGN OUT
             </div>
           </>
@@ -68,4 +74,4 @@ const mapStateToProps = createStructuredSelector({
   currentUser: selectCurrentUser,
   hidden: selectCartHidden,
 });
-export default connect(mapStateToProps)(Header);
+export default connect(mapStateToProps, { setCurrentUser })(Header);

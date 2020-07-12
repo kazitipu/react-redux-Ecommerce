@@ -19,66 +19,29 @@ class SignIn extends React.Component {
   }
 
   onGoogleSignIn = () => {
-    auth.signInWithPopup(provider);
-    auth.onAuthStateChanged((user) => {
-      if (user) {
-        firestore.doc(`users/${user.uid}`).set({
-          displayName: user.displayName,
-          email: user.email,
-          password: "",
-        });
-      }
-    });
+    const { user } = auth.signInWithPopup(provider);
+    if (user) {
+      firestore.doc(`users/${user.uid}`).set({
+        displayName: user.displayName,
+        email: user.email,
+        password: "",
+      });
+    }
   };
 
   handleSubmit = async (event) => {
     event.preventDefault();
+
     const { email, password } = this.state;
-    auth
-      .signInWithEmailAndPassword(email, password)
-      .catch((error) => alert(error.message));
-    auth.onAuthStateChanged((user) => {
-      user
-        ? this.props.setCurrentUser({
-            displayName: user.displayName,
-            email: email,
-            password: password,
-          })
-        : this.props.setCurrentUser({
-            displayName: "",
-            email: "",
-            password: "",
-          });
-    });
 
-    // const user = [];
-    // await firestore
-    //   .collection("users")
-    //   .get()
-    //   .then((snapShot) => {
-    //     snapShot.forEach((doc) => {
-    //       if (doc.data().email === email && doc.data().password === password) {
-    //         this.props.setCurrentUser({
-    //           displayName: doc.data().displayName,
-    //           email: doc.data().email,
-    //           password: doc.data().password,
-    //         });
-    //       user.push({
-    //         displayName: doc.data().displayName,
-    //         email: doc.data().email,
-    //         password: doc.data().password,
-    //       });
-    //     }
-    //   });
-    // });
-
-    // if (!user[0]) {
-    //   alert(
-    //     "Your password and email doesn't match.make sure you have na id with this email"
-    //   );
-    // }
-
-    this.setState({ email: "", password: "" });
+    try {
+      await auth
+        .signInWithEmailAndPassword(email, password)
+        .catch((error) => alert(error.message));
+      this.setState({ email: "", password: "" });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   componentWillUnmount() {
@@ -95,7 +58,7 @@ class SignIn extends React.Component {
       <div className="sign-in">
         <h1 className="title">I already have an account</h1>
         <span>please sign in with your email and password</span>
-        <form onSubmit={this.handleSubmit}>
+        <form name="sign-in" onSubmit={this.handleSubmit}>
           <FormInput
             type="email"
             name="email"
@@ -111,7 +74,9 @@ class SignIn extends React.Component {
             label="password"
           />
           <div className="buttons">
-            <CustomButton type="submit"> SIGN IN </CustomButton>
+            <CustomButton type="submit" htmlFor="sign-in">
+              SIGN IN
+            </CustomButton>
             <CustomButton
               type="button"
               onClick={this.onGoogleSignIn}

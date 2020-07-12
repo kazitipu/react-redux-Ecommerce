@@ -2,7 +2,7 @@ import React from "react";
 import "./sign-up.styles.scss";
 import FormInput from "../form-input/form-input.component";
 import CustomButton from "../custom-button/custom-button.component";
-import { auth, firestore } from "../../firebase/firebase.utils";
+import { auth, createUserProfileDocument } from "../../firebase/firebase.utils";
 import { connect } from "react-redux";
 import { setCurrentUser } from "../../redux/users/users.action";
 class SignUp extends React.Component {
@@ -22,45 +22,32 @@ class SignUp extends React.Component {
   }
   handleSubmit = async (event) => {
     event.preventDefault();
-    var { displayName, email, password, confirmPassword } = this.state;
 
-    if (password === confirmPassword) {
-      try {
-        await auth.createUserWithEmailAndPassword(email, password);
-        auth.onAuthStateChanged((user) => {
-          if (user) {
-            firestore.doc(`users/${user.uid}`).set({
-              displayName,
-              email,
-              password,
-            });
-            this.props.setCurrentUser({
-              displayName,
-              email,
-              password,
-            });
-          } else {
-            this.props.setCurrentUser({
-              displayName: "",
-              email: "",
-              password: "",
-            });
-          }
-        });
-      } catch (error) {
-        alert(error);
-      }
-    } else {
-      alert("your password doesn't match");
+    const { displayName, email, password, confirmPassword } = this.state;
+
+    if (password !== confirmPassword) {
+      alert("passwords don't match");
+      return;
     }
 
-    this.setState({
-      displayName: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-    });
+    try {
+      const { user } = await auth
+        .createUserWithEmailAndPassword(email, password)
+        .catch((error) => alert(error.message));
+
+      await createUserProfileDocument(user, { displayName });
+
+      this.setState({
+        displayName: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+      });
+    } catch (error) {
+      console.error(error);
+    }
   };
+
   componentWillUnmount() {
     this.unsubscribFromAuth = null;
   }
@@ -74,7 +61,7 @@ class SignUp extends React.Component {
       <div className="sign-up">
         <h1 className="title">I don't have an account</h1>
         <span>Sign up with your email and password</span>
-        <form onSubmit={this.handleSubmit}>
+        <form name="sign-up" onSubmit={this.handleSubmit}>
           <FormInput
             type="text"
             name="displayName"
@@ -103,9 +90,10 @@ class SignUp extends React.Component {
             handleChange={this.handleChange}
             label="confirm password"
           />
-          <div className="buttons">
-            <CustomButton type="submit"> SIGN UP </CustomButton>
-          </div>
+
+          <CustomButton type="submit" htmlFor="sign-up">
+            SIGN UP
+          </CustomButton>
         </form>
       </div>
     );
