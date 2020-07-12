@@ -12,7 +12,13 @@ import { createStore } from "redux";
 import { persistStore } from "redux-persist";
 import { PersistGate } from "redux-persist/integration/react";
 
-const store = createStore(reducer, applyMiddleware(logger));
+const middlewares = [];
+
+if (process.env.NODE_ENV === "development") {
+  middlewares.push(logger);
+}
+
+const store = createStore(reducer, applyMiddleware(...middlewares));
 const persistor = persistStore(store);
 
 ReactDOM.render(

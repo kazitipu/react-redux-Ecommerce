@@ -3,7 +3,8 @@ import "./sign-up.styles.scss";
 import FormInput from "../form-input/form-input.component";
 import CustomButton from "../custom-button/custom-button.component";
 import { auth, firestore } from "../../firebase/firebase.utils";
-
+import { connect } from "react-redux";
+import { setCurrentUser } from "../../redux/users/users.action";
 class SignUp extends React.Component {
   constructor(props) {
     super(props);
@@ -17,7 +18,7 @@ class SignUp extends React.Component {
   }
   unsubscribFromAuth = null;
   componentDidMount() {
-    console.log(this.props);
+    this.unsubscribFromAuth = true;
   }
   handleSubmit = async (event) => {
     event.preventDefault();
@@ -25,22 +26,26 @@ class SignUp extends React.Component {
 
     if (password === confirmPassword) {
       try {
-        this.unsubscribFromAuth = await auth.createUserWithEmailAndPassword(
-          email,
-          password
-        );
+        await auth.createUserWithEmailAndPassword(email, password);
         auth.onAuthStateChanged((user) => {
-          firestore.doc(`users/${user.uid}`).set({
-            displayName,
-            email,
-            password,
-          });
-        });
-
-        this.props.setCurrentUser({
-          displayName,
-          email,
-          password,
+          if (user) {
+            firestore.doc(`users/${user.uid}`).set({
+              displayName,
+              email,
+              password,
+            });
+            this.props.setCurrentUser({
+              displayName,
+              email,
+              password,
+            });
+          } else {
+            this.props.setCurrentUser({
+              displayName: "",
+              email: "",
+              password: "",
+            });
+          }
         });
       } catch (error) {
         alert(error);
@@ -106,4 +111,4 @@ class SignUp extends React.Component {
     );
   }
 }
-export default SignUp;
+export default connect(null, { setCurrentUser })(SignUp);

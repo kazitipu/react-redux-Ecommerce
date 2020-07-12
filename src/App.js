@@ -10,6 +10,9 @@ import { connect } from "react-redux";
 import { setCurrentUser } from "./redux/users/users.action";
 import CheckoutPage from "./pages/chekcout/checkout.component";
 import CollectionPage from "./pages/collection/collection.component";
+import { createStructuredSelector } from "reselect";
+import { selectCurrentUser } from "./redux/users/users.selector";
+import { Redirect } from "react-router";
 
 class App extends React.Component {
   unsuscribeFromAuth = null;
@@ -21,7 +24,7 @@ class App extends React.Component {
           .doc(`users/${user.uid}`)
           .get()
           .then((doc) => {
-            console.log(doc.data());
+            // console.log(doc.data());
             this.props.setCurrentUser({
               displayName: doc.data().displayName,
               email: doc.data().email,
@@ -42,9 +45,6 @@ class App extends React.Component {
     this.unsuscribeFromAuth = null;
   }
 
-  setCurrentUser = (user) => {
-    this.props.setCurrentUser({ currentUser: user });
-  };
   render() {
     return (
       <div>
@@ -56,13 +56,19 @@ class App extends React.Component {
         <Route
           exact
           path="/signin"
-          component={() => (
-            <SignInAndSignUpPage setCurrentUser={this.setCurrentUser} />
-          )}
+          component={() =>
+            !this.props.user.displayName ? (
+              <SignInAndSignUpPage />
+            ) : (
+              <Redirect to="/" />
+            )
+          }
         />
       </div>
     );
   }
 }
-
-export default connect(null, { setCurrentUser })(App);
+const mapStateToProps = createStructuredSelector({
+  user: selectCurrentUser,
+});
+export default connect(mapStateToProps, { setCurrentUser })(App);

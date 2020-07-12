@@ -7,8 +7,8 @@ class SignInAndSignUpPage extends React.Component {
   render() {
     return (
       <div className="sign-in-and-sign-up">
-        <SignIn setCurrentUser={this.props.setCurrentUser} />
-        <SignUp setCurrentUser={this.props.setCurrentUser} />
+        <SignIn />
+        <SignUp />
       </div>
     );
   }

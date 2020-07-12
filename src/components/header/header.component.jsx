@@ -13,7 +13,7 @@ import { selectCartHidden } from "../../redux/cart/cart.selectors";
 class Header extends React.Component {
   renderButton = () => {
     const { currentUser } = this.props;
-    console.log(currentUser);
+    // console.log(currentUser);
 
     if (!currentUser) {
       return (
