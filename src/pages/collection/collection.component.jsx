@@ -4,14 +4,14 @@ import CollectionItem from "../../components/collection-item/collection-item.com
 import { connect } from "react-redux";
 import { selectedCollectionItems } from "./collection.utils";
 
-const CollectionPage = ({ collections, match }) => {
+const CollectionPage = ({ collections, match, history }) => {
   return (
     <div className="collection-page">
       <div className="title">{match.params.collectionId.toUpperCase()}</div>
       <div className="items">
         {collections ? (
           collections.map((item) => (
-            <CollectionItem key={item.id} item={item} />
+            <CollectionItem key={item.id} item={item} history={history} />
           ))
         ) : (
           <></>

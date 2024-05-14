@@ -3,6 +3,7 @@ import "./App.css";
 import { Route } from "react-router-dom";
 import HomePage from "./pages/homepage/homepage.component";
 import ShopPage from "./pages/shop-page/shop-page.component";
+import Product from "./pages/product-page/product";
 import Header from "./components/header/header.component";
 import SignInAndSignUpPage from "./pages/signIn-and-signUp-page/signIn-and-signUp-page.component";
 import { auth, createUserProfileDocument } from "./firebase/firebase.utils";
@@ -41,6 +42,7 @@ class App extends React.Component {
         <Route exact path="/shop/:collectionId" component={CollectionPage} />
         <Route exact path="/" component={HomePage} />
         <Route exact path="/shop" component={ShopPage} />
+        <Route exact path="/products/:productId" component={Product} />
         <Route exact path="/checkout" component={CheckoutPage} />
         <Route
           exact
